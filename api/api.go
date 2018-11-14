@@ -18,6 +18,7 @@ type Config struct {
 	DatabaseConnectionString string
 	ClientID                 string
 	ClientSecret             string
+	JWTSecret                string
 }
 
 // NewAPI creates a new API
