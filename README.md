@@ -3,5 +3,12 @@
 ## Starting by environment variable
 
 ```
-ODDSVR_STRAVA_CLIENT_ID=<xxxx> ODDSVR_STRAVA_CLIENT_SECRET=<xxxx> ODDSVR_JWT_SECRET=<xxxx> oddsvr
+<environment variables initialization...> oddsvr
 ```
+
+## Supported environment
+
+| Name | Description |
+| --- | --- |
+| ODDSVR_ADDR | (default 0.0.0.0:1323) Listening address |
+| ODDSVR_DB | (default 127.0.0.1:27107) MongoDB server address |
