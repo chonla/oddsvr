@@ -5,6 +5,7 @@ import (
 
 	"github.com/chonla/oddsvr/db"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 // API represents API type
@@ -40,7 +41,17 @@ func (a *API) Serve(addr string) {
 	e.HideBanner = true
 	e.HidePort = true
 
+	e.Use(middleware.CORS())
+
 	e.GET("/gateway", a.GatewayHandler)
+
+	r := e.Group("/api")
+	jwtConfig := middleware.JWTConfig{
+		Claims:     &JWTClaims{},
+		SigningKey: []byte(a.config.JWTSecret),
+	}
+	r.Use(middleware.JWTWithConfig(jwtConfig))
+	r.GET("/me", a.MeHandler)
 
 	Info(fmt.Sprintf("server is listening on %s", addr))
 	e.Logger.Fatal(e.Start(addr))

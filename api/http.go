@@ -3,11 +3,38 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
-type client struct{}
+type client struct {
+	AccessToken string
+}
+
+func (c *client) Get(url string, output interface{}) error {
+	httpClient := &http.Client{}
+	req, e := http.NewRequest("GET", url, nil)
+	if e != nil {
+		return e
+	}
+	if c.AccessToken != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.AccessToken))
+	}
+	resp, e := httpClient.Do(req)
+	if e != nil {
+		return e
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+
+	e = json.Unmarshal(bodyBytes, output)
+	if e != nil {
+		return e
+	}
+	return nil
+}
 
 func (c *client) Post(url string, data, output interface{}) error {
 	b := new(bytes.Buffer)

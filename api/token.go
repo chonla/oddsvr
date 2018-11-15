@@ -2,7 +2,16 @@ package api
 
 import (
 	"encoding/json"
+
+	jwt "github.com/dgrijalva/jwt-go"
 )
+
+// c represents customized of claims
+type JWTClaims struct {
+	ID          uint32 `json:"id"`
+	StravaToken string `json:"strava_token"`
+	jwt.StandardClaims
+}
 
 // TokenEx for doing token exchange with strava api
 type TokenEx struct {
@@ -32,6 +41,22 @@ type Athlete struct {
 	ProfilePicture       string `json:"profile"`
 	ProfilePictureMedium string `json:"profile_medium"`
 	Email                string `json:"email"`
+	Stats                `json:"stats"`
+}
+
+// Stats is running stats
+type Stats struct {
+	RecentRunTotals RunStats `json:"recent_run_totals"`
+	AllRunTotals    RunStats `json:"all_run_totals"`
+}
+
+// RunStats is detailed of stats
+type RunStats struct {
+	Count         uint32  `json:"count"`
+	Distance      float64 `json:"distance"`
+	MovingTime    uint32  `json:"moving_time"`
+	ElapsedTime   uint32  `json:"elapsed_time"`
+	ElevationGain float64 `json:"elevation_gain"`
 }
 
 // Token is token responded from strava
@@ -51,6 +76,11 @@ type InvertedToken struct {
 
 func (t *Token) String() string {
 	b, _ := json.Marshal(t)
+	return string(b)
+}
+
+func (a *Athlete) String() string {
+	b, _ := json.Marshal(a)
 	return string(b)
 }
 
