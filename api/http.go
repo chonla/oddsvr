@@ -21,19 +21,23 @@ func (c *client) Get(url string, output interface{}) error {
 	if c.AccessToken != "" {
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.AccessToken))
 	}
+
 	resp, e := httpClient.Do(req)
 	if e != nil {
 		return e
 	}
 	defer resp.Body.Close()
 
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode == 200 {
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
 
-	e = json.Unmarshal(bodyBytes, output)
-	if e != nil {
-		return e
+		e = json.Unmarshal(bodyBytes, output)
+		if e != nil {
+			return e
+		}
+		return nil
 	}
-	return nil
+	return fmt.Errorf("error: %s", resp.Status)
 }
 
 func (c *client) Post(url string, data, output interface{}) error {

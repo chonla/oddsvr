@@ -55,7 +55,7 @@ func (a *API) GatewayHandler(c echo.Context) error {
 		ID:          token.ID,
 		StravaToken: token.AccessToken,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 3).Unix(),
 		},
 	}
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -68,7 +68,7 @@ func (a *API) GatewayHandler(c echo.Context) error {
 	cookie := new(http.Cookie)
 	cookie.Name = "token"
 	cookie.Value = t
-	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Expires = time.Now().Add(3 * time.Hour)
 
 	c.SetCookie(cookie)
 
