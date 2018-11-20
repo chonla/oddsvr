@@ -30,7 +30,6 @@ func (c *client) Get(url string, output interface{}) error {
 
 	if resp.StatusCode == 200 {
 		bodyBytes, _ := ioutil.ReadAll(resp.Body)
-
 		e = json.Unmarshal(bodyBytes, output)
 		if e != nil {
 			return e
