@@ -53,4 +53,5 @@ type VirtualRun struct {
 	Name     string        `json:"name"`
 	FromDate string        `json:"from_date"`
 	ToDate   string        `json:"to_date"`
+	Athletes []uint32      `json:"athletes"`
 }

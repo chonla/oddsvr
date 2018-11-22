@@ -6,7 +6,9 @@ import (
 
 // NewVr creates a new fresh virtual run
 func NewVr() *VirtualRun {
-	return &VirtualRun{}
+	return &VirtualRun{
+		Athletes: []uint32{},
+	}
 }
 
 // NewVrFromContext creates a new virtual run from incoming post request

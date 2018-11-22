@@ -15,6 +15,29 @@ const (
 	apiOAuth = "https://www.strava.com/oauth/token"
 )
 
+// VrJoinHandler engages user to a run
+func (a *API) VrJoinHandler(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*JWTClaims)
+	uid := claims.ID
+
+	vr := NewVr()
+	id := c.Param("id")
+	if a.hasVr(id) {
+		e := a.loadVr(id, vr)
+		if e != nil {
+			return c.JSON(http.StatusInternalServerError, e)
+		}
+
+		vr.Athletes = append(vr.Athletes, uid)
+
+		a.saveVr(vr)
+	} else {
+		return c.NoContent(http.StatusNotFound)
+	}
+	return c.JSON(http.StatusOK, vr)
+}
+
 // VrGetHandler returns virtual run info
 func (a *API) VrGetHandler(c echo.Context) error {
 	vr := NewVr()
@@ -32,6 +55,10 @@ func (a *API) VrGetHandler(c echo.Context) error {
 
 // VrCreationHandler creates a new virtual run
 func (a *API) VrCreationHandler(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*JWTClaims)
+	uid := claims.ID
+
 	vr, e := NewVrFromContext(c)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, e)
@@ -39,13 +66,17 @@ func (a *API) VrCreationHandler(c echo.Context) error {
 
 	newID := bson.NewObjectId()
 	vr.ID = newID
+	vr.Athletes = []uint32{
+		uid,
+	}
 
 	id, e := a.saveVr(vr)
 	if e != nil {
 		return c.JSON(http.StatusInternalServerError, e)
 	}
 	c.Response().Header().Add("Location", fmt.Sprintf("/vr/%s", id))
-	return c.NoContent(http.StatusCreated)
+
+	return c.JSON(http.StatusCreated, vr)
 }
 
 // MeGetHandler returns information of myself
