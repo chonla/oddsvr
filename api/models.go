@@ -1,5 +1,9 @@
 package api
 
+import (
+	"github.com/globalsign/mgo/bson"
+)
+
 // Athlete is runner profile
 type Athlete struct {
 	ID                   uint32 `json:"id"`
@@ -41,4 +45,12 @@ type Activity struct {
 	Type           string  `json:"type"`
 	StartDate      string  `json:"string"`
 	TimeZoneOffset float64 `json:"utc_offset"`
+}
+
+// VirtualRun is virtual run
+type VirtualRun struct {
+	ID       bson.ObjectId `json:"_id,omitempty"`
+	Name     string        `json:"name"`
+	FromDate string        `json:"from_date"`
+	ToDate   string        `json:"to_date"`
 }

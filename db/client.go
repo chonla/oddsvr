@@ -1,8 +1,8 @@
 package db
 
 import (
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
 // Client is mongodb client
@@ -11,16 +11,21 @@ type Client struct {
 	db      *mgo.Database
 }
 
+var dbClient *Client
+
 // NewClient creates a new mongodb client
 func NewClient(connection, database string) (*Client, error) {
-	session, e := mgo.Dial(connection)
-	if e != nil {
-		return nil, e
+	if dbClient == nil {
+		session, e := mgo.Dial(connection)
+		if e != nil {
+			return nil, e
+		}
+		dbClient = &Client{
+			session: session,
+			db:      session.DB(database),
+		}
 	}
-	return &Client{
-		session: session,
-		db:      session.DB(database),
-	}, nil
+	return dbClient, nil
 }
 
 // Save data to given collection
@@ -29,10 +34,16 @@ func (c *Client) Save(collection string, data interface{}) error {
 }
 
 // Replace data with given one
-func (c *Client) Replace(collection string, id uint32, data interface{}) error {
+func (c *Client) Replace(collection string, id interface{}, data interface{}) error {
 	updateData := bson.M{
 		"$set": data,
 	}
 	_, e := c.db.C(collection).UpsertId(id, updateData)
+	return e
+}
+
+// Insert data with given object
+func (c *Client) Insert(collection string, data interface{}) error {
+	e := c.db.C(collection).Insert(data)
 	return e
 }

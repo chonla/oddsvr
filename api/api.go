@@ -52,6 +52,7 @@ func (a *API) Serve(addr string) {
 	}
 	r.Use(middleware.JWTWithConfig(jwtConfig))
 	r.GET("/me", a.MeHandler)
+	r.POST("/vr", a.VrCreationHandler)
 
 	Info(fmt.Sprintf("server is listening on %s", addr))
 	e.Logger.Fatal(e.Start(addr))
