@@ -51,8 +51,9 @@ func (a *API) Serve(addr string) {
 		SigningKey: []byte(a.config.JWTSecret),
 	}
 	r.Use(middleware.JWTWithConfig(jwtConfig))
-	r.GET("/me", a.MeHandler)
+	r.GET("/me", a.MeGetHandler)
 	r.POST("/vr", a.VrCreationHandler)
+	r.GET("/vr/:id", a.VrGetHandler)
 
 	Info(fmt.Sprintf("server is listening on %s", addr))
 	e.Logger.Fatal(e.Start(addr))

@@ -15,11 +15,25 @@ const (
 	apiOAuth = "https://www.strava.com/oauth/token"
 )
 
+// VrGetHandler returns virtual run info
+func (a *API) VrGetHandler(c echo.Context) error {
+	vr := NewVr()
+	id := c.Param("id")
+	if a.hasVr(id) {
+		e := a.loadVr(id, vr)
+		if e != nil {
+			return c.JSON(http.StatusInternalServerError, e)
+		}
+	} else {
+		return c.NoContent(http.StatusNotFound)
+	}
+	return c.JSON(http.StatusOK, vr)
+}
+
 // VrCreationHandler creates a new virtual run
 func (a *API) VrCreationHandler(c echo.Context) error {
 	vr, e := NewVrFromContext(c)
 	if e != nil {
-		fmt.Println("cannot bind request")
 		c.JSON(http.StatusInternalServerError, e)
 	}
 
@@ -34,8 +48,8 @@ func (a *API) VrCreationHandler(c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
-// MeHandler returns information of myself
-func (a *API) MeHandler(c echo.Context) error {
+// MeGetHandler returns information of myself
+func (a *API) MeGetHandler(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(*JWTClaims)
 	token := claims.StravaToken

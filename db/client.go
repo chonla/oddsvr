@@ -47,3 +47,19 @@ func (c *Client) Insert(collection string, data interface{}) error {
 	e := c.db.C(collection).Insert(data)
 	return e
 }
+
+// Has returns true if collection contain document with given id
+func (c *Client) Has(collection string, id interface{}) bool {
+	q := c.db.C(collection).FindId(bson.ObjectIdHex(id.(string))).Limit(1)
+	count, e := q.Count()
+	if e != nil {
+		return false
+	}
+	return (count > 0)
+}
+
+// Get load data from collection with given id into output
+func (c *Client) Get(collection string, id interface{}, output interface{}) error {
+	q := c.db.C(collection).FindId(bson.ObjectIdHex(id.(string))).Limit(1)
+	return q.Select(bson.M{}).One(output)
+}
