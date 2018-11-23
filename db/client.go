@@ -63,3 +63,8 @@ func (c *Client) Get(collection string, id interface{}, output interface{}) erro
 	q := c.db.C(collection).FindId(bson.ObjectIdHex(id.(string))).Limit(1)
 	return q.Select(bson.M{}).One(output)
 }
+
+// List all data from given filter in collection into output
+func (c *Client) List(collection string, filter interface{}, output interface{}) error {
+	return c.db.C(collection).Find(filter).All(output)
+}

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo"
 )
 
@@ -33,4 +34,8 @@ func (a *API) hasVr(id string) bool {
 
 func (a *API) loadVr(id string, output *VirtualRun) error {
 	return a.dbc.Get("virtualrun", id, output)
+}
+
+func (a *API) loadMyVr(myid uint32, output *[]VirtualRun) error {
+	return a.dbc.List("virtualrun", bson.M{"athletes": myid}, output)
 }

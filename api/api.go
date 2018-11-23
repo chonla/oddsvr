@@ -55,6 +55,7 @@ func (a *API) Serve(addr string) {
 	r.POST("/vr", a.VrCreationHandler)
 	r.GET("/vr/:id", a.VrGetHandler)
 	r.GET("/vr/:id/join", a.VrJoinHandler)
+	r.GET("/vr", a.VrGetMineHandler)
 
 	Info(fmt.Sprintf("server is listening on %s", addr))
 	e.Logger.Fatal(e.Start(addr))

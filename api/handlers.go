@@ -38,6 +38,20 @@ func (a *API) VrJoinHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, vr)
 }
 
+// VrGetMineHandler returns virtual run info
+func (a *API) VrGetMineHandler(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*JWTClaims)
+	uid := claims.ID
+
+	vrs := []VirtualRun{}
+	e := a.loadMyVr(uid, &vrs)
+	if e != nil {
+		return c.JSON(http.StatusInternalServerError, e)
+	}
+	return c.JSON(http.StatusOK, vrs)
+}
+
 // VrGetHandler returns virtual run info
 func (a *API) VrGetHandler(c echo.Context) error {
 	vr := NewVr()
