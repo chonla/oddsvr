@@ -58,6 +58,17 @@ type VirtualRun struct {
 	Engagements     []Engagement  `json:"engagements" bson:"engagements"`
 }
 
+// VirtualRunSummary is summary of virtual run
+type VirtualRunSummary struct {
+	ID               bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty"`
+	CreatedBy        uint32        `json:"created_by" bson:"created_by"`
+	CreatedDateTime  string        `json:"created_datetime" bson:"created_datetime"`
+	Name             string        `json:"name" bson:"name"`
+	FromDate         string        `json:"from_date" bson:"from_date"`
+	ToDate           string        `json:"to_date" bson:"to_date"`
+	EngagementsCount int           `json:"engagements_count" bson:"engagements_count"`
+}
+
 // Engagement is engagement between run and athletes
 type Engagement struct {
 	Athlete  uint32  `json:"athlete" bson:"athlete"`

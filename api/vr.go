@@ -56,3 +56,27 @@ func (a *API) loadMyVr(myid uint32, output *[]VirtualRun) error {
 
 	return a.dbc.List("virtualrun", filter, output)
 }
+
+// func (a *API) loadMyVrSummary(myid uint32, output *[]VirtualRunSummary) error {
+// 	aggregate := []bson.M{
+// 		bson.M{
+// 			"$match": bson.M{
+// 				"engagements": bson.M{
+// 					"$elemMatch": bson.M{
+// 						"athlete": myid,
+// 					},
+// 				},
+// 			},
+// 		},
+// 		bson.M{
+// 			"$group": bson.M{
+// 				"_id": "$_id",
+// 				"count": bson.M{
+// 					"$sum": 1,
+// 				},
+// 			},
+// 		},
+// 	}
+
+// 	return a.dbc.Aggregate("virtualrun", aggregate, output)
+// }

@@ -58,7 +58,19 @@ func (a *API) VrGetMineHandler(c echo.Context) error {
 	if e != nil {
 		return c.JSON(http.StatusInternalServerError, e)
 	}
-	return c.JSON(http.StatusOK, vrs)
+	vrsum := []VirtualRunSummary{}
+	for _, v := range vrs {
+		vrsum = append(vrsum, VirtualRunSummary{
+			ID:               v.ID,
+			CreatedBy:        v.CreatedBy,
+			CreatedDateTime:  v.CreatedDateTime,
+			FromDate:         v.FromDate,
+			ToDate:           v.ToDate,
+			Name:             v.Name,
+			EngagementsCount: len(v.Engagements),
+		})
+	}
+	return c.JSON(http.StatusOK, vrsum)
 }
 
 // VrGetHandler returns virtual run info

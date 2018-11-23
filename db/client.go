@@ -68,3 +68,8 @@ func (c *Client) Get(collection string, id interface{}, output interface{}) erro
 func (c *Client) List(collection string, filter interface{}, output interface{}) error {
 	return c.db.C(collection).Find(filter).All(output)
 }
+
+// Aggregate performs aggregation function
+func (c *Client) Aggregate(collection string, pipe interface{}, output interface{}) error {
+	return c.db.C(collection).Pipe(pipe).All(output)
+}
