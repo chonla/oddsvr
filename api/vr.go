@@ -8,17 +8,26 @@ import (
 // NewVr creates a new fresh virtual run
 func NewVr() *VirtualRun {
 	return &VirtualRun{
-		Athletes: []uint32{},
+		Engagements: []Engagement{},
 	}
 }
 
 // NewVrFromContext creates a new virtual run from incoming post request
-func NewVrFromContext(c echo.Context) (*VirtualRun, error) {
-	vr := new(VirtualRun)
+func NewVrFromContext(c echo.Context) (*VirtualRunCreateRequest, error) {
+	vr := new(VirtualRunCreateRequest)
 	if err := c.Bind(vr); err != nil {
 		return nil, err
 	}
 	return vr, nil
+}
+
+// NewDistanceFromContext creates a distance from incoming post request
+func NewDistanceFromContext(c echo.Context) (*Distance, error) {
+	distance := new(Distance)
+	if err := c.Bind(distance); err != nil {
+		return nil, err
+	}
+	return distance, nil
 }
 
 // Save to save current object to db
@@ -37,5 +46,13 @@ func (a *API) loadVr(id string, output *VirtualRun) error {
 }
 
 func (a *API) loadMyVr(myid uint32, output *[]VirtualRun) error {
-	return a.dbc.List("virtualrun", bson.M{"athletes": myid}, output)
+	filter := bson.M{
+		"engagements": bson.M{
+			"$elemMatch": bson.M{
+				"athlete": myid,
+			},
+		},
+	}
+
+	return a.dbc.List("virtualrun", filter, output)
 }

@@ -49,9 +49,28 @@ type Activity struct {
 
 // VirtualRun is virtual run
 type VirtualRun struct {
-	ID       bson.ObjectId `json:"_id,omitempty"`
-	Name     string        `json:"name"`
-	FromDate string        `json:"from_date"`
-	ToDate   string        `json:"to_date"`
-	Athletes []uint32      `json:"athletes"`
+	ID          bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty"`
+	Name        string        `json:"name" bson:"name"`
+	FromDate    string        `json:"from_date" bson:"from_date"`
+	ToDate      string        `json:"to_date" bson:"to_date"`
+	Engagements []Engagement  `json:"engagements" bson:"engagements"`
+}
+
+// Engagement is engagement between run and athletes
+type Engagement struct {
+	Athlete  uint32  `json:"athlete" bson:"athlete"`
+	Distance float64 `json:"distance" bson:"distance"`
+}
+
+// Distance is just distance
+type Distance struct {
+	Distance float64 `json:"distance" bson:"distance"`
+}
+
+// VirtualRunCreateRequest is virtual run creation request
+type VirtualRunCreateRequest struct {
+	Name     string  `json:"name"`
+	FromDate string  `json:"from_date"`
+	ToDate   string  `json:"to_date"`
+	Distance float64 `json:"distance"`
 }

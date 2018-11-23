@@ -21,6 +21,11 @@ func (a *API) VrJoinHandler(c echo.Context) error {
 	claims := user.Claims.(*JWTClaims)
 	uid := claims.ID
 
+	dist, e := NewDistanceFromContext(c)
+	if e != nil {
+		return c.JSON(http.StatusInternalServerError, e)
+	}
+
 	vr := NewVr()
 	id := c.Param("id")
 	if a.hasVr(id) {
@@ -29,7 +34,11 @@ func (a *API) VrJoinHandler(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, e)
 		}
 
-		vr.Athletes = append(vr.Athletes, uid)
+		vr.Engagements = append(vr.Engagements,
+			Engagement{
+				Athlete:  uid,
+				Distance: dist.Distance,
+			})
 
 		a.saveVr(vr)
 	} else {
@@ -73,15 +82,23 @@ func (a *API) VrCreationHandler(c echo.Context) error {
 	claims := user.Claims.(*JWTClaims)
 	uid := claims.ID
 
-	vr, e := NewVrFromContext(c)
+	vrc, e := NewVrFromContext(c)
 	if e != nil {
-		c.JSON(http.StatusInternalServerError, e)
+		return c.JSON(http.StatusInternalServerError, e)
 	}
+
+	vr := NewVr()
+	vr.Name = vrc.Name
+	vr.FromDate = vrc.FromDate
+	vr.ToDate = vrc.ToDate
 
 	newID := bson.NewObjectId()
 	vr.ID = newID
-	vr.Athletes = []uint32{
-		uid,
+	vr.Engagements = []Engagement{
+		Engagement{
+			Athlete:  uid,
+			Distance: vrc.Distance,
+		},
 	}
 
 	id, e := a.saveVr(vr)
