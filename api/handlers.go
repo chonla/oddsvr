@@ -100,6 +100,10 @@ func (a *API) VrCreationHandler(c echo.Context) error {
 			Distance: vrc.Distance,
 		},
 	}
+	vr.CreatedBy = uid
+
+	now := time.Now()
+	vr.CreatedDateTime = now.Format(time.RFC3339)
 
 	id, e := a.saveVr(vr)
 	if e != nil {
