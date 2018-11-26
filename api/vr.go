@@ -42,8 +42,20 @@ func (a *API) hasVr(id string) bool {
 	return a.dbc.Has("virtualrun", id)
 }
 
+func (a *API) hasVrByLink(id string) bool {
+	return a.dbc.HasBy("virtualrun", bson.M{
+		"link": id,
+	})
+}
+
 func (a *API) loadVr(id string, output *VirtualRun) error {
 	return a.dbc.Get("virtualrun", id, output)
+}
+
+func (a *API) loadVrByLink(id string, output *VirtualRun) error {
+	return a.dbc.GetBy("virtualrun", bson.M{
+		"link": id,
+	}, output)
 }
 
 func (a *API) loadMyVr(myid uint32, output *[]VirtualRun) error {

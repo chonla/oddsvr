@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/kr/pretty"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo"
@@ -28,8 +30,9 @@ func (a *API) VrJoinHandler(c echo.Context) error {
 
 	vr := NewVr()
 	id := c.Param("id")
-	if a.hasVr(id) {
-		e := a.loadVr(id, vr)
+	fmt.Println(id)
+	if a.hasVrByLink(id) {
+		e := a.loadVrByLink(id, vr)
 		if e != nil {
 			return c.JSON(http.StatusInternalServerError, e)
 		}
@@ -74,17 +77,50 @@ func (a *API) VrGetMineHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, vrsum)
 }
 
-// VrGetHandler returns virtual run info
-func (a *API) VrGetHandler(c echo.Context) error {
+// VrGetByLinkHandler returns virtual run info
+func (a *API) VrGetByLinkHandler(c echo.Context) error {
 	vr := NewVr()
 	id := c.Param("id")
-	if a.hasVr(id) {
-		e := a.loadVr(id, vr)
+	if a.hasVrByLink(id) {
+		e := a.loadVrByLink(id, vr)
 		if e != nil {
 			return c.JSON(http.StatusInternalServerError, e)
 		}
 	} else {
 		return c.NoContent(http.StatusNotFound)
+	}
+	vr.Joined = false
+	return c.JSON(http.StatusOK, vr)
+}
+
+// VrGetByPrivateLinkHandler returns virtual run info
+func (a *API) VrGetByPrivateLinkHandler(c echo.Context) error {
+	var uid uint32
+	if c.Get("user") != nil {
+		user := c.Get("user").(*jwt.Token)
+		claims := user.Claims.(*JWTClaims)
+		uid = claims.ID
+		pretty.Println("uid = %d", uid)
+	}
+
+	vr := NewVr()
+	id := c.Param("id")
+	if a.hasVrByLink(id) {
+		e := a.loadVrByLink(id, vr)
+		if e != nil {
+			return c.JSON(http.StatusInternalServerError, e)
+		}
+	} else {
+		return c.NoContent(http.StatusNotFound)
+	}
+	vr.Joined = false
+	for _, eng := range vr.Engagements {
+		pretty.Println(eng)
+		pretty.Println(uid)
+		if eng.Athlete == uid {
+			vr.Joined = true
+			break
+		}
 	}
 	return c.JSON(http.StatusOK, vr)
 }
@@ -115,6 +151,7 @@ func (a *API) VrCreationHandler(c echo.Context) error {
 		},
 	}
 	vr.CreatedBy = uid
+	vr.Joined = true
 
 	now := time.Now()
 	vr.CreatedDateTime = now.Format(time.RFC3339)
@@ -144,8 +181,7 @@ func (a *API) MeGetHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, me)
 }
 
-// GatewayHandler handles request redirect_uri
-func (a *API) GatewayHandler(c echo.Context) error {
+func (a *API) gateway(c echo.Context) error {
 	code := c.QueryParam("code")
 	tokenEx := TokenEx{
 		ClientID:     a.config.ClientID,
@@ -182,8 +218,31 @@ func (a *API) GatewayHandler(c echo.Context) error {
 	cookie.Name = "token"
 	cookie.Value = t
 	cookie.Expires = time.Now().Add(3 * time.Hour)
+	cookie.Path = "/"
 
 	c.SetCookie(cookie)
 
-	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:4200/vr/dashboard")
+	return nil
+}
+
+// GatewayAndGoToHandler handles request redirect_uri
+func (a *API) GatewayAndGoToHandler(c echo.Context) error {
+	id := c.Param("id")
+
+	e := a.gateway(c)
+	if e != nil {
+		return e
+	}
+
+	return c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("http://localhost:4200/vr/%s", id))
+}
+
+// GatewayHandler handles request redirect_uri
+func (a *API) GatewayHandler(c echo.Context) error {
+	e := a.gateway(c)
+	if e != nil {
+		return e
+	}
+
+	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:4200/vr")
 }

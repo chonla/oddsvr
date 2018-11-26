@@ -44,8 +44,11 @@ func (a *API) Serve(addr string) {
 	e.Use(middleware.CORS())
 
 	e.GET("/gateway", a.GatewayHandler)
+	e.GET("/gateway/:id", a.GatewayAndGoToHandler)
 
 	r := e.Group("/api")
+	r.GET("/vr/:id", a.VrGetByLinkHandler)
+
 	jwtConfig := middleware.JWTConfig{
 		Claims:     &JWTClaims{},
 		SigningKey: []byte(a.config.JWTSecret),
@@ -53,9 +56,9 @@ func (a *API) Serve(addr string) {
 	r.Use(middleware.JWTWithConfig(jwtConfig))
 	r.GET("/me", a.MeGetHandler)
 	r.POST("/vr", a.VrCreationHandler)
-	r.GET("/vr/:id", a.VrGetHandler)
-	r.GET("/vr/:id/join", a.VrJoinHandler)
+	r.POST("/join/:id", a.VrJoinHandler)
 	r.GET("/vr", a.VrGetMineHandler)
+	r.GET("/vrx/:id", a.VrGetByPrivateLinkHandler)
 
 	Info(fmt.Sprintf("server is listening on %s", addr))
 	e.Logger.Fatal(e.Start(addr))

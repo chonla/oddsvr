@@ -48,6 +48,16 @@ func (c *Client) Insert(collection string, data interface{}) error {
 	return e
 }
 
+// HasBy returns true if collection contain document with given filter
+func (c *Client) HasBy(collection string, filter interface{}) bool {
+	q := c.db.C(collection).Find(filter).Limit(1)
+	count, e := q.Count()
+	if e != nil {
+		return false
+	}
+	return (count > 0)
+}
+
 // Has returns true if collection contain document with given id
 func (c *Client) Has(collection string, id interface{}) bool {
 	q := c.db.C(collection).FindId(bson.ObjectIdHex(id.(string))).Limit(1)
@@ -56,6 +66,12 @@ func (c *Client) Has(collection string, id interface{}) bool {
 		return false
 	}
 	return (count > 0)
+}
+
+// GetBy load data from collection with given id into output
+func (c *Client) GetBy(collection string, filter interface{}, output interface{}) error {
+	q := c.db.C(collection).Find(filter).Limit(1)
+	return q.Select(bson.M{}).One(output)
 }
 
 // Get load data from collection with given id into output
