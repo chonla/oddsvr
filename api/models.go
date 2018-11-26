@@ -55,6 +55,7 @@ type VirtualRun struct {
 	Name            string        `json:"name" bson:"name"`
 	FromDate        string        `json:"from_date" bson:"from_date"`
 	ToDate          string        `json:"to_date" bson:"to_date"`
+	Link            string        `json:"link" bson:"link"`
 	Engagements     []Engagement  `json:"engagements" bson:"engagements"`
 }
 
@@ -66,6 +67,7 @@ type VirtualRunSummary struct {
 	Name             string        `json:"name" bson:"name"`
 	FromDate         string        `json:"from_date" bson:"from_date"`
 	ToDate           string        `json:"to_date" bson:"to_date"`
+	Link             string        `json:"link" bson:"link"`
 	EngagementsCount int           `json:"engagements_count" bson:"engagements_count"`
 }
 

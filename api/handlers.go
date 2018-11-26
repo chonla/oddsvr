@@ -67,6 +67,7 @@ func (a *API) VrGetMineHandler(c echo.Context) error {
 			FromDate:         v.FromDate,
 			ToDate:           v.ToDate,
 			Name:             v.Name,
+			Link:             v.Link,
 			EngagementsCount: len(v.Engagements),
 		})
 	}
@@ -103,6 +104,7 @@ func (a *API) VrCreationHandler(c echo.Context) error {
 	vr.Name = vrc.Name
 	vr.FromDate = vrc.FromDate
 	vr.ToDate = vrc.ToDate
+	vr.Link = a.createSafeVrLink()
 
 	newID := bson.NewObjectId()
 	vr.ID = newID
@@ -183,5 +185,5 @@ func (a *API) GatewayHandler(c echo.Context) error {
 
 	c.SetCookie(cookie)
 
-	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:4200/dashboard")
+	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:4200/vr/dashboard")
 }

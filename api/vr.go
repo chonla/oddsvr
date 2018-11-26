@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/chonla/rnd"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo"
 )
@@ -55,6 +56,11 @@ func (a *API) loadMyVr(myid uint32, output *[]VirtualRun) error {
 	}
 
 	return a.dbc.List("virtualrun", filter, output)
+}
+
+func (a *API) createSafeVrLink() string {
+	link := rnd.Alphanum(12)
+	return link
 }
 
 // func (a *API) loadMyVrSummary(myid uint32, output *[]VirtualRunSummary) error {
