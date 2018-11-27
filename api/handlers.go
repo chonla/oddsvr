@@ -30,11 +30,16 @@ func (a *API) VrJoinHandler(c echo.Context) error {
 
 	vr := NewVr()
 	id := c.Param("id")
-	fmt.Println(id)
 	if a.hasVrByLink(id) {
 		e := a.loadVrByLink(id, vr)
 		if e != nil {
 			return c.JSON(http.StatusInternalServerError, e)
+		}
+
+		for _, eng := range vr.Engagements {
+			if eng.Athlete == uid {
+				return c.JSON(http.StatusOK, vr)
+			}
 		}
 
 		vr.Engagements = append(vr.Engagements,
