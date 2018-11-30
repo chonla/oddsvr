@@ -239,7 +239,7 @@ func (a *API) GatewayAndGoToHandler(c echo.Context) error {
 		return e
 	}
 
-	return c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("http://localhost:4200/vr/%s", id))
+	return c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("http://localhost/vr/%s", id))
 }
 
 // GatewayHandler handles request redirect_uri
@@ -249,5 +249,5 @@ func (a *API) GatewayHandler(c echo.Context) error {
 		return e
 	}
 
-	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:4200/vr")
+	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost/vr")
 }
