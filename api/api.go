@@ -43,10 +43,9 @@ func (a *API) Serve(addr string) {
 
 	e.Use(middleware.CORS())
 
+	r := e.Group("/api")
 	e.GET("/gateway", a.GatewayHandler)
 	e.GET("/gateway/:id", a.GatewayAndGoToHandler)
-
-	r := e.Group("/api")
 	r.GET("/vr/:id", a.VrGetByLinkHandler)
 
 	jwtConfig := middleware.JWTConfig{
