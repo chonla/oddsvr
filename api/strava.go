@@ -59,11 +59,13 @@ func (s *strava) Me(token string) (*Athlete, error) {
 	}
 
 	for _, a := range activities {
-		stats.ThisMonthRunTotals.Count++
-		stats.ThisMonthRunTotals.Distance += a.Distance
-		stats.ThisMonthRunTotals.ElapsedTime += a.ElapsedTime
-		stats.ThisMonthRunTotals.MovingTime += a.MovingTime
-		stats.ThisMonthRunTotals.ElevationGain += a.ElevationGain
+		if a.Type == "Run" {
+			stats.ThisMonthRunTotals.Count++
+			stats.ThisMonthRunTotals.Distance += a.Distance
+			stats.ThisMonthRunTotals.ElapsedTime += a.ElapsedTime
+			stats.ThisMonthRunTotals.MovingTime += a.MovingTime
+			stats.ThisMonthRunTotals.ElevationGain += a.ElevationGain
+		}
 	}
 
 	me.Stats = stats
