@@ -49,26 +49,51 @@ func (s *strava) Me(token string) (*Athlete, error) {
 	endOfMonth := firstOfMonth.AddDate(0, 1, -1)
 	before := endOfMonth.Unix()
 	after := firstOfMonth.Unix()
+	// page := 1
+
+	activities, e = s.MyRunnings(&c, before, after, 100)
+
+	// perPage := 100
+	// query := fmt.Sprintf("before=%d&after=%d&page=%d&per_page=%d", before, after, page, perPage)
+
+	// e = c.Get(fmt.Sprintf("%s/athlete/activities?%s", apiBase, query), &activities)
+	// if e != nil {
+	// 	return nil, e
+	// }
+
+	for _, a := range activities {
+		// if a.Type == "Run" {
+		stats.ThisMonthRunTotals.Count++
+		stats.ThisMonthRunTotals.Distance += a.Distance
+		stats.ThisMonthRunTotals.ElapsedTime += a.ElapsedTime
+		stats.ThisMonthRunTotals.MovingTime += a.MovingTime
+		stats.ThisMonthRunTotals.ElevationGain += a.ElevationGain
+		// }
+	}
+
+	me.Stats = stats
+
+	return &me, nil
+}
+
+func (s *strava) MyRunnings(c *client, before, after int64, maxResult int32) ([]Activity, error) {
+	activities := []Activity{}
+	out := []Activity{}
+
 	page := 1
-	perPage := 100
+	perPage := maxResult
 	query := fmt.Sprintf("before=%d&after=%d&page=%d&per_page=%d", before, after, page, perPage)
 
-	e = c.Get(fmt.Sprintf("%s/athlete/activities?%s", apiBase, query), &activities)
+	e := c.Get(fmt.Sprintf("%s/athlete/activities?%s", apiBase, query), &activities)
 	if e != nil {
 		return nil, e
 	}
 
 	for _, a := range activities {
 		if a.Type == "Run" {
-			stats.ThisMonthRunTotals.Count++
-			stats.ThisMonthRunTotals.Distance += a.Distance
-			stats.ThisMonthRunTotals.ElapsedTime += a.ElapsedTime
-			stats.ThisMonthRunTotals.MovingTime += a.MovingTime
-			stats.ThisMonthRunTotals.ElevationGain += a.ElevationGain
+			out = append(out, a)
 		}
 	}
 
-	me.Stats = stats
-
-	return &me, nil
+	return activities, nil
 }
