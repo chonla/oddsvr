@@ -65,6 +65,8 @@ func (s *strava) Me(token string) (*Athlete, error) {
 		stats.RecentRun.Distance = activities[0].Distance
 		stats.RecentRun.MovingTime = activities[0].MovingTime
 		stats.RecentRun.ElapsedTime = activities[0].ElapsedTime
+		stats.RecentRun.StartDate = activities[0].StartDate
+		stats.RecentRun.TimeZoneOffset = activities[0].TimeZoneOffset
 	}
 
 	me.Stats = stats

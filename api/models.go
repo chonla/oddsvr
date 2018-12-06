@@ -30,10 +30,12 @@ type Stats struct {
 
 // RecentStats is stats of recent run
 type RecentStats struct {
-	Distance    float64 `json:"distance"`
-	ElapsedTime uint32  `json:"elapsed_time"`
-	MovingTime  uint32  `json:"moving_time"`
-	Title       string  `json:"title"`
+	Distance       float64 `json:"distance"`
+	ElapsedTime    uint32  `json:"elapsed_time"`
+	MovingTime     uint32  `json:"moving_time"`
+	Title          string  `json:"title"`
+	StartDate      string  `json:"start_date"`
+	TimeZoneOffset float64 `json:"utc_offset"`
 }
 
 // RunStats is detailed of stats
@@ -52,7 +54,7 @@ type Activity struct {
 	ElapsedTime    uint32  `json:"elapsed_time"`
 	ElevationGain  float64 `json:"total_elevation_gain"`
 	Type           string  `json:"type"`
-	StartDate      string  `json:"string"`
+	StartDate      string  `json:"start_date"`
 	TimeZoneOffset float64 `json:"utc_offset"`
 	Title          string  `json:"name"`
 }
