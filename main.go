@@ -26,12 +26,14 @@ func main() {
 		os.Exit(1)
 	}
 	dbServer, _ := env("ODDSVR_DB", "127.0.0.1:27017", "database address", false)
+	frontBase, _ := env("ODDSVR_FRONT_BASE", "http://localhost", "front end web address", false)
 
 	conf := &api.Config{
 		DatabaseConnectionString: dbServer,
 		ClientID:                 stravaClientID,
 		ClientSecret:             stravaClientSecret,
 		JWTSecret:                jwtSecret,
+		FrontBase:                frontBase,
 	}
 	vr, e := api.NewAPI(conf)
 	if e != nil {

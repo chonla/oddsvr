@@ -20,6 +20,7 @@ type Config struct {
 	ClientID                 string
 	ClientSecret             string
 	JWTSecret                string
+	FrontBase                string
 }
 
 // NewAPI creates a new API

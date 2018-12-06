@@ -15,6 +15,7 @@ services:
       - ODDSVR_JWT_SECRET=WhyWhoWhatHow
       - ODDSVR_DB=oddsvradmin:oddsvrpassword@db:27017
       - ODDSVR_ADDR=0.0.0.0:8080
+      - ODDSVR_FRONT_BASE=http://localhost:4200
     networks:
       - apinet
   db:
