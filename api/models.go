@@ -22,9 +22,18 @@ type Athlete struct {
 
 // Stats is running stats
 type Stats struct {
-	RecentRunTotals    RunStats `json:"recent_run_totals"`
-	AllRunTotals       RunStats `json:"all_run_totals"`
-	ThisMonthRunTotals RunStats `json:"this_month_run_totals"`
+	RecentRun          RecentStats `json:"recent"`
+	RecentRunTotals    RunStats    `json:"recent_run_totals"`
+	AllRunTotals       RunStats    `json:"all_run_totals"`
+	ThisMonthRunTotals RunStats    `json:"this_month_run_totals"`
+}
+
+// RecentStats is stats of recent run
+type RecentStats struct {
+	Distance    float64 `json:"distance"`
+	ElapsedTime uint32  `json:"elapsed_time"`
+	MovingTime  uint32  `json:"moving_time"`
+	Title       string  `json:"title"`
 }
 
 // RunStats is detailed of stats
@@ -45,6 +54,7 @@ type Activity struct {
 	Type           string  `json:"type"`
 	StartDate      string  `json:"string"`
 	TimeZoneOffset float64 `json:"utc_offset"`
+	Title          string  `json:"name"`
 }
 
 // VirtualRun is virtual run

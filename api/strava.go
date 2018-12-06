@@ -60,6 +60,13 @@ func (s *strava) Me(token string) (*Athlete, error) {
 		stats.ThisMonthRunTotals.ElevationGain += a.ElevationGain
 	}
 
+	if len(activities) > 0 {
+		stats.RecentRun.Title = activities[0].Title
+		stats.RecentRun.Distance = activities[0].Distance
+		stats.RecentRun.MovingTime = activities[0].MovingTime
+		stats.RecentRun.ElapsedTime = activities[0].ElapsedTime
+	}
+
 	me.Stats = stats
 
 	return &me, nil
