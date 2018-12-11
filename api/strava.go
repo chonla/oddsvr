@@ -74,6 +74,8 @@ func (s *strava) Me(token string) (*Athlete, error) {
 	before = endOfYear.Unix()
 	after = firstOfYear.Unix()
 
+	activities, e = s.MyRunnings(&c, before, after, 800)
+
 	for _, a := range activities {
 		stats.ThisYearRunTotals.Count++
 		stats.ThisYearRunTotals.Distance += a.Distance
