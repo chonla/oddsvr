@@ -105,7 +105,7 @@ func (a *API) VrGetByPrivateLinkHandler(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)
 		claims := user.Claims.(*JWTClaims)
 		uid = claims.ID
-		pretty.Println("uid = %d", uid)
+		// pretty.Println("uid = %d", uid)
 	}
 
 	vr := NewVr()
@@ -176,7 +176,7 @@ func (a *API) MeGetHandler(c echo.Context) error {
 	claims := user.Claims.(*JWTClaims)
 	token := claims.StravaToken
 
-	s := NewStrava()
+	s := NewStrava(a.cache)
 
 	me, e := s.Me(token)
 	if e != nil {
@@ -194,7 +194,7 @@ func (a *API) gateway(c echo.Context) error {
 		Code:         code,
 	}
 
-	s := NewStrava()
+	s := NewStrava(a.cache)
 
 	token, _ := s.TokenExchange(tokenEx)
 	e := a.saveToken(&InvertedToken{

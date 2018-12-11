@@ -42,6 +42,14 @@ func (c *Client) Replace(collection string, id interface{}, data interface{}) er
 	return e
 }
 
+func (c *Client) ReplaceBy(collection string, filter interface{}, data interface{}) error {
+	updateData := bson.M{
+		"$set": data,
+	}
+	_, e := c.db.C(collection).Upsert(filter, updateData)
+	return e
+}
+
 // Insert data with given object
 func (c *Client) Insert(collection string, data interface{}) error {
 	e := c.db.C(collection).Insert(data)

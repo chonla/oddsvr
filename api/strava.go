@@ -4,17 +4,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kr/pretty"
+	"github.com/chonla/oddsvr/httpcache"
 )
 
-type strava struct{}
-
-// NewStrava creates new strava interface
-func NewStrava() *strava {
-	return &strava{}
+type Strava struct {
+	c *httpcache.Cache
 }
 
-func (s *strava) TokenExchange(t TokenEx) (*Token, error) {
+// NewStrava creates new strava interface
+func NewStrava(c *httpcache.Cache) *Strava {
+	return &Strava{
+		c: c,
+	}
+}
+
+func (s *Strava) TokenExchange(t TokenEx) (*Token, error) {
 	c := client{}
 	token := Token{}
 
@@ -26,7 +30,7 @@ func (s *strava) TokenExchange(t TokenEx) (*Token, error) {
 	return &token, nil
 }
 
-func (s *strava) Me(token string) (*Athlete, error) {
+func (s *Strava) Me(token string) (*Athlete, error) {
 	c := client{
 		AccessToken: token,
 	}
@@ -58,7 +62,7 @@ func (s *strava) Me(token string) (*Athlete, error) {
 		endOfCursor := firstOfYearCursor.AddDate(0, 1, -1)
 		before := endOfCursor.Unix()
 
-		activities, e = s.MyRunnings(&c, before, after, 100)
+		activities, e = s.MyRunnings(&c, me.ID, before, after, 100)
 
 		for _, a := range activities {
 			stats.ThisYearRunTotals.Count++
@@ -95,20 +99,21 @@ func (s *strava) Me(token string) (*Athlete, error) {
 	return &me, nil
 }
 
-func (s *strava) MyRunnings(c *client, before, after int64, maxResult int32) ([]Activity, error) {
+func (s *Strava) MyRunnings(c *client, myid uint32, before, after int64, maxResult int32) ([]Activity, error) {
 	activities := []Activity{}
 	out := []Activity{}
+
+	cacheKey := fmt.Sprintf("athlete_activities_%d_%d_%d", myid, before, after)
+	c.Cacher = s.c
 
 	page := 1
 	perPage := maxResult
 	query := fmt.Sprintf("before=%d&after=%d&page=%d&per_page=%d", before, after, page, perPage)
 
-	e := c.Get(fmt.Sprintf("%s/athlete/activities?%s", apiBase, query), &activities)
+	e := c.GetWithCache(cacheKey, fmt.Sprintf("%s/athlete/activities?%s", apiBase, query), "", &activities)
 	if e != nil {
 		return nil, e
 	}
-
-	pretty.Println(activities)
 
 	for _, a := range activities {
 		if a.Type == "Run" {

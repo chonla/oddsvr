@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/chonla/oddsvr/db"
+	"github.com/chonla/oddsvr/httpcache"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -12,6 +13,7 @@ import (
 type API struct {
 	config *Config
 	dbc    *db.Client
+	cache  *httpcache.Cache
 }
 
 // Config represents configuration
@@ -30,9 +32,11 @@ func NewAPI(conf *Config) (*API, error) {
 	if e != nil {
 		return nil, e
 	}
+	cac := httpcache.NewCache(dbConnection)
 	return &API{
 		config: conf,
 		dbc:    dbConnection,
+		cache:  cac,
 	}, nil
 }
 
