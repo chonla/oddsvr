@@ -3,6 +3,8 @@ package api
 import (
 	"fmt"
 	"time"
+
+	"github.com/kr/pretty"
 )
 
 type strava struct{}
@@ -69,19 +71,27 @@ func (s *strava) Me(token string) (*Athlete, error) {
 		stats.RecentRun.TimeZoneOffset = activities[0].TimeZoneOffset
 	}
 
+	// Due to limit of response, too large response will be dropped without reason.
+	// Try to request year stats by looping month-by-month instead.
 	firstOfYear := time.Date(currentYear, 1, 1, 0, 0, 0, 0, currentLocation)
-	endOfYear := firstOfYear.AddDate(1, 0, -1)
-	before = endOfYear.Unix()
-	after = firstOfYear.Unix()
+	firstOfYearCursor := firstOfYear
+	after = firstOfYearCursor.Unix()
+	for m := 0; m < 12; m++ {
+		endOfCursor := firstOfYearCursor.AddDate(0, 1, -1)
+		before = endOfCursor.Unix()
 
-	activities, e = s.MyRunnings(&c, before, after, 500)
+		activities, e = s.MyRunnings(&c, before, after, 100)
 
-	for _, a := range activities {
-		stats.ThisYearRunTotals.Count++
-		stats.ThisYearRunTotals.Distance += a.Distance
-		stats.ThisYearRunTotals.ElapsedTime += a.ElapsedTime
-		stats.ThisYearRunTotals.MovingTime += a.MovingTime
-		stats.ThisYearRunTotals.ElevationGain += a.ElevationGain
+		for _, a := range activities {
+			stats.ThisYearRunTotals.Count++
+			stats.ThisYearRunTotals.Distance += a.Distance
+			stats.ThisYearRunTotals.ElapsedTime += a.ElapsedTime
+			stats.ThisYearRunTotals.MovingTime += a.MovingTime
+			stats.ThisYearRunTotals.ElevationGain += a.ElevationGain
+		}
+
+		firstOfYearCursor = firstOfYearCursor.AddDate(0, 1, 0)
+		after = firstOfYearCursor.Unix()
 	}
 
 	me.Stats = stats
@@ -101,6 +111,8 @@ func (s *strava) MyRunnings(c *client, before, after int64, maxResult int32) ([]
 	if e != nil {
 		return nil, e
 	}
+
+	pretty.Println(activities)
 
 	for _, a := range activities {
 		if a.Type == "Run" {
