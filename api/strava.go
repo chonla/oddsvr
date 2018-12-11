@@ -47,13 +47,32 @@ func (s *strava) Me(token string) (*Athlete, error) {
 	now := time.Now()
 	currentYear, currentMonth, _ := now.Date()
 	currentLocation := now.Location()
-	firstOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, currentLocation)
-	endOfMonth := firstOfMonth.AddDate(0, 1, -1)
-	before := endOfMonth.Unix()
-	after := firstOfMonth.Unix()
 
-	activities, e = s.MyRunnings(&c, before, after, 100)
+	// Due to limit of response, too large response will be dropped without reason.
+	// Try to request year stats by looping month-by-month instead.
+	firstOfYear := time.Date(currentYear, 1, 1, 0, 0, 0, 0, currentLocation)
+	firstOfYearCursor := firstOfYear
+	after := firstOfYearCursor.Unix()
+	var thisMonth = int(currentMonth)
+	for m := 0; m < thisMonth; m++ {
+		endOfCursor := firstOfYearCursor.AddDate(0, 1, -1)
+		before := endOfCursor.Unix()
 
+		activities, e = s.MyRunnings(&c, before, after, 100)
+
+		for _, a := range activities {
+			stats.ThisYearRunTotals.Count++
+			stats.ThisYearRunTotals.Distance += a.Distance
+			stats.ThisYearRunTotals.ElapsedTime += a.ElapsedTime
+			stats.ThisYearRunTotals.MovingTime += a.MovingTime
+			stats.ThisYearRunTotals.ElevationGain += a.ElevationGain
+		}
+
+		firstOfYearCursor = firstOfYearCursor.AddDate(0, 1, 0)
+		after = firstOfYearCursor.Unix()
+	}
+
+	// Reuse recent activities for this month activities
 	for _, a := range activities {
 		stats.ThisMonthRunTotals.Count++
 		stats.ThisMonthRunTotals.Distance += a.Distance
@@ -69,29 +88,6 @@ func (s *strava) Me(token string) (*Athlete, error) {
 		stats.RecentRun.ElapsedTime = activities[0].ElapsedTime
 		stats.RecentRun.StartDate = activities[0].StartDate
 		stats.RecentRun.TimeZoneOffset = activities[0].TimeZoneOffset
-	}
-
-	// Due to limit of response, too large response will be dropped without reason.
-	// Try to request year stats by looping month-by-month instead.
-	firstOfYear := time.Date(currentYear, 1, 1, 0, 0, 0, 0, currentLocation)
-	firstOfYearCursor := firstOfYear
-	after = firstOfYearCursor.Unix()
-	for m := 0; m < 12; m++ {
-		endOfCursor := firstOfYearCursor.AddDate(0, 1, -1)
-		before = endOfCursor.Unix()
-
-		activities, e = s.MyRunnings(&c, before, after, 100)
-
-		for _, a := range activities {
-			stats.ThisYearRunTotals.Count++
-			stats.ThisYearRunTotals.Distance += a.Distance
-			stats.ThisYearRunTotals.ElapsedTime += a.ElapsedTime
-			stats.ThisYearRunTotals.MovingTime += a.MovingTime
-			stats.ThisYearRunTotals.ElevationGain += a.ElevationGain
-		}
-
-		firstOfYearCursor = firstOfYearCursor.AddDate(0, 1, 0)
-		after = firstOfYearCursor.Unix()
 	}
 
 	me.Stats = stats
