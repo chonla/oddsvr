@@ -26,6 +26,7 @@ type Stats struct {
 	RecentRunTotals    RunStats    `json:"recent_run_totals"`
 	AllRunTotals       RunStats    `json:"all_run_totals"`
 	ThisMonthRunTotals RunStats    `json:"this_month_run_totals"`
+	ThisYearRunTotals  RunStats    `json:"this_year_run_totals"`
 }
 
 // RecentStats is stats of recent run

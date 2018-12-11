@@ -69,6 +69,19 @@ func (s *strava) Me(token string) (*Athlete, error) {
 		stats.RecentRun.TimeZoneOffset = activities[0].TimeZoneOffset
 	}
 
+	firstOfYear := time.Date(currentYear, 1, 1, 0, 0, 0, 0, currentLocation)
+	endOfYear := firstOfYear.AddDate(1, 0, -1)
+	before = endOfYear.Unix()
+	after = firstOfYear.Unix()
+
+	for _, a := range activities {
+		stats.ThisYearRunTotals.Count++
+		stats.ThisYearRunTotals.Distance += a.Distance
+		stats.ThisYearRunTotals.ElapsedTime += a.ElapsedTime
+		stats.ThisYearRunTotals.MovingTime += a.MovingTime
+		stats.ThisYearRunTotals.ElevationGain += a.ElevationGain
+	}
+
 	me.Stats = stats
 
 	return &me, nil
