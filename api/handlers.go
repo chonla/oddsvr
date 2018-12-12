@@ -152,6 +152,7 @@ func (a *API) VrCreationHandler(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, e)
 	}
 	c.Response().Header().Add("Location", fmt.Sprintf("/vr/%s", vr.Link))
+	c.Response().Header().Add("X-New-Vr-ID", id)
 
 	return c.JSON(http.StatusCreated, vr)
 }
