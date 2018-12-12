@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/globalsign/mgo/bson"
+
 	"github.com/kr/pretty"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo"
 )
 
@@ -72,9 +73,8 @@ func (a *API) VrGetMineHandler(c echo.Context) error {
 			ID:               v.ID,
 			CreatedBy:        v.CreatedBy,
 			CreatedDateTime:  v.CreatedDateTime,
-			FromDate:         v.FromDate,
-			ToDate:           v.ToDate,
-			Name:             v.Name,
+			Period:           v.Period,
+			Title:            v.Title,
 			Link:             v.Link,
 			EngagementsCount: len(v.Engagements),
 		})
@@ -94,7 +94,6 @@ func (a *API) VrGetByLinkHandler(c echo.Context) error {
 	} else {
 		return c.NoContent(http.StatusNotFound)
 	}
-	vr.Joined = false
 	return c.JSON(http.StatusOK, vr)
 }
 
@@ -118,12 +117,10 @@ func (a *API) VrGetByPrivateLinkHandler(c echo.Context) error {
 	} else {
 		return c.NoContent(http.StatusNotFound)
 	}
-	vr.Joined = false
 	for _, eng := range vr.Engagements {
 		pretty.Println(eng)
 		pretty.Println(uid)
 		if eng.Athlete == uid {
-			vr.Joined = true
 			break
 		}
 	}
@@ -142,30 +139,19 @@ func (a *API) VrCreationHandler(c echo.Context) error {
 	}
 
 	vr := NewVr()
-	vr.Name = vrc.Name
-	vr.FromDate = vrc.FromDate
-	vr.ToDate = vrc.ToDate
+	vr.ID = bson.NewObjectId()
+	vr.Title = vrc.Title
+	vr.Detail = vrc.Detail
+	vr.Period = vrc.Period
 	vr.Link = a.createSafeVrLink()
-
-	newID := bson.NewObjectId()
-	vr.ID = newID
-	vr.Engagements = []Engagement{
-		Engagement{
-			Athlete:  uid,
-			Distance: vrc.Distance,
-		},
-	}
 	vr.CreatedBy = uid
-	vr.Joined = true
-
-	now := time.Now()
-	vr.CreatedDateTime = now.Format(time.RFC3339)
+	vr.CreatedDateTime = time.Now().Format(time.RFC3339)
 
 	id, e := a.saveVr(vr)
 	if e != nil {
 		return c.JSON(http.StatusInternalServerError, e)
 	}
-	c.Response().Header().Add("Location", fmt.Sprintf("/vr/%s", id))
+	c.Response().Header().Add("Location", fmt.Sprintf("/vr/%s", vr.Link))
 
 	return c.JSON(http.StatusCreated, vr)
 }

@@ -65,11 +65,10 @@ type VirtualRun struct {
 	ID              bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty"`
 	CreatedBy       uint32        `json:"created_by" bson:"created_by"`
 	CreatedDateTime string        `json:"created_datetime" bson:"created_datetime"`
-	Name            string        `json:"name" bson:"name"`
-	FromDate        string        `json:"from_date" bson:"from_date"`
-	ToDate          string        `json:"to_date" bson:"to_date"`
+	Title           string        `json:"title" bson:"title"`
+	Detail          string        `json:"detail" bson:"detail"`
+	Period          []string      `json:"period" bson:"period"`
 	Link            string        `json:"link" bson:"link"`
-	Joined          bool          `json:"joined"`
 	Engagements     []Engagement  `json:"engagements" bson:"engagements"`
 }
 
@@ -78,11 +77,10 @@ type VirtualRunSummary struct {
 	ID               bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty"`
 	CreatedBy        uint32        `json:"created_by" bson:"created_by"`
 	CreatedDateTime  string        `json:"created_datetime" bson:"created_datetime"`
-	Name             string        `json:"name" bson:"name"`
-	FromDate         string        `json:"from_date" bson:"from_date"`
-	ToDate           string        `json:"to_date" bson:"to_date"`
+	Title            string        `json:"title" bson:"title"`
+	Detail           string        `json:"detail" bson:"detail"`
+	Period           []string      `json:"period" bson:"period"`
 	Link             string        `json:"link" bson:"link"`
-	Joined           bool          `json:"joined"`
 	EngagementsCount int           `json:"engagements_count" bson:"engagements_count"`
 }
 
@@ -99,8 +97,7 @@ type Distance struct {
 
 // VirtualRunCreateRequest is virtual run creation request
 type VirtualRunCreateRequest struct {
-	Name     string  `json:"name"`
-	FromDate string  `json:"from_date"`
-	ToDate   string  `json:"to_date"`
-	Distance float64 `json:"distance"`
+	Title  string   `json:"title"`
+	Period []string `json:"period"`
+	Detail string   `json:"detail"`
 }
