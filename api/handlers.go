@@ -53,7 +53,10 @@ func (a *API) VrJoinHandler(c echo.Context) error {
 	} else {
 		return c.NoContent(http.StatusNotFound)
 	}
-	return c.JSON(http.StatusOK, vr)
+
+	c.Response().Header().Add("Location", fmt.Sprintf("/vr/%s", vr.Link))
+	c.Response().Header().Add("X-Join-Vr-ID", id)
+	return c.JSON(http.StatusCreated, vr)
 }
 
 // VrGetAvailableHandler returns virtual run info
