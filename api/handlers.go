@@ -239,6 +239,12 @@ func (a *API) gateway(c echo.Context) error {
 
 	c.SetCookie(cookie)
 
+	myIdCookie := new(http.Cookie)
+	myIdCookie.Name = "me"
+	myIdCookie.Value = fmt.Sprintf("%d", token.ID)
+	myIdCookie.Expires = time.Now().Add(3 * time.Hour)
+	myIdCookie.Path = "/"
+
 	return nil
 }
 
