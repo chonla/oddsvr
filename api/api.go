@@ -59,10 +59,10 @@ func (a *API) Serve(addr string) {
 	}
 	r.Use(middleware.JWTWithConfig(jwtConfig))
 	r.GET("/me", a.MeGetHandler)
-	r.POST("/vr", a.VrCreationHandler)
-	r.GET("/vr/mine", a.VrGetMineHandler)
-	r.POST("/join/:id", a.VrJoinHandler)
+	r.GET("/me/vr", a.VrGetMineHandler)
 	r.GET("/vr", a.VrGetAvailableHandler)
+	r.POST("/vr", a.VrCreationHandler)
+	r.POST("/join/:id", a.VrJoinHandler)
 	r.GET("/vrx/:id", a.VrGetByPrivateLinkHandler)
 
 	Info(fmt.Sprintf("server is listening on %s", addr))
