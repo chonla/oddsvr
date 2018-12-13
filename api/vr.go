@@ -52,6 +52,10 @@ func (a *API) loadVr(id string, output *VirtualRun) error {
 	return a.dbc.Get("virtualrun", id, output)
 }
 
+func (a *API) loadAvailableVr(output *[]VirtualRun) error {
+	return a.dbc.List("virtualrun", bson.M{}, output)
+}
+
 func (a *API) loadVrByLink(id string, output *VirtualRun) error {
 	return a.dbc.GetBy("virtualrun", bson.M{
 		"link": id,

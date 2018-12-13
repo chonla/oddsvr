@@ -56,6 +56,28 @@ func (a *API) VrJoinHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, vr)
 }
 
+// VrGetAvailableHandler returns virtual run info
+func (a *API) VrGetAvailableHandler(c echo.Context) error {
+	vrs := []VirtualRun{}
+	e := a.loadAvailableVr(&vrs)
+	if e != nil {
+		return c.JSON(http.StatusInternalServerError, e)
+	}
+	vrsum := []VirtualRunSummary{}
+	for _, v := range vrs {
+		vrsum = append(vrsum, VirtualRunSummary{
+			ID:               v.ID,
+			CreatedBy:        v.CreatedBy,
+			CreatedDateTime:  v.CreatedDateTime,
+			Period:           v.Period,
+			Title:            v.Title,
+			Link:             v.Link,
+			EngagementsCount: len(v.Engagements),
+		})
+	}
+	return c.JSON(http.StatusOK, vrsum)
+}
+
 // VrGetMineHandler returns virtual run info
 func (a *API) VrGetMineHandler(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
