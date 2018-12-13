@@ -245,6 +245,8 @@ func (a *API) gateway(c echo.Context) error {
 	myIdCookie.Expires = time.Now().Add(3 * time.Hour)
 	myIdCookie.Path = "/"
 
+	c.SetCookie(myIdCookie)
+
 	return nil
 }
 
